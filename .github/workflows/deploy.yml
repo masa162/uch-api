@@ -46,6 +46,9 @@ jobs:
           script: |
             cd /var/www/uch/uch-api
             
+            # Add this line to pull the latest code
+            git pull origin main
+            
             # Create .env file from secrets
             echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
             echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
