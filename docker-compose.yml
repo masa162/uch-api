@@ -3,7 +3,7 @@
 version: '3.8'
 services:
   app:
-    build: .
+    image: ghcr.io/masa162/uch-api:latest
     ports:
       - "3000:3000"
     volumes:
