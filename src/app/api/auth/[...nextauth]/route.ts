@@ -40,7 +40,7 @@ const handler = NextAuth({
       }
       return token;
     },
-    async redirect({ url, baseUrl }) {
+    async redirect({ url }) {
       // 常にフロントエンドのドメインを基準とする
       const redirectUrl = "https://uchinokiroku.com";
 
