@@ -36,6 +36,10 @@ const handler = NextAuth({
       }
       return token;
     },
+    async redirect({ url, baseUrl }) {
+      // ログイン・ログアウト後は、常にフロントエンドのトップページに戻す
+      return "https://uchinokiroku.com";
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
 });
