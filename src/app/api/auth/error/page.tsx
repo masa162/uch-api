@@ -1,6 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 export default function AuthErrorPage() {
   const searchParams = useSearchParams();
@@ -32,20 +33,20 @@ export default function AuthErrorPage() {
         </div>
         <div className="mt-8 space-y-6">
           <div className="text-center">
-            <a
+            <Link
               href="/api/auth/signin"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               再度ログイン
-            </a>
+            </Link>
           </div>
           <div className="text-center">
-            <a
+            <Link
               href="https://uchinokiroku.com"
               className="text-indigo-600 hover:text-indigo-500"
             >
               ホームページに戻る
-            </a>
+            </Link>
           </div>
         </div>
       </div>
