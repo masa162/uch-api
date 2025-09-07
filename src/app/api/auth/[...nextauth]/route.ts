@@ -26,7 +26,6 @@ const handler = NextAuth({
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        // 必要に応じてroleなどのカスタムプロパティをセッションに追加
       }
       return session;
     },
@@ -37,13 +36,20 @@ const handler = NextAuth({
       return token;
     },
     async redirect({ url, baseUrl }) {
-      // デフォルトの動作に任せることで、フロントエンドからのcallbackUrlを尊重させる
-      if (url.startsWith(baseUrl)) {
-        return url;
-      } else if (url.startsWith("/")) {
-        return new URL(url, baseUrl).toString();
+      // 常にフロントエンドのドメインを基準とする
+      const redirectUrl = "https://uchinokiroku.com";
+
+      // 渡されたURLが相対パス（例: "/dashboard"）の場合、フロントエンドドメインに結合
+      if (url.startsWith("/")) {
+        return `${redirectUrl}${url}`;
       }
-      return baseUrl;
+      // 渡されたURLが既にフロントエンドのドメインを含む場合、それを許可
+      if (new URL(url).origin === redirectUrl) {
+        return url;
+      }
+
+      // 上記以外の場合は、安全のためにフロントエンドのトップに戻す
+      return redirectUrl;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
