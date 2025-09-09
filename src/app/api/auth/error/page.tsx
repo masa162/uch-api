@@ -11,11 +11,27 @@ function AuthErrorContent() {
   const getErrorMessage = (error: string | null) => {
     switch (error) {
       case 'Configuration':
-        return 'サーバー設定に問題があります。管理者にお問い合わせください。';
+        return 'サーバー設定に問題があります。Google OAuth認証情報が正しく設定されていない可能性があります。管理者にお問い合わせください。';
       case 'AccessDenied':
         return 'アクセスが拒否されました。';
       case 'Verification':
         return '認証トークンが無効または期限切れです。';
+      case 'OAuthCallback':
+        return 'OAuth認証のコールバック処理でエラーが発生しました。';
+      case 'OAuthCreateAccount':
+        return 'アカウント作成時にエラーが発生しました。';
+      case 'OAuthSignin':
+        return 'OAuthサインイン処理でエラーが発生しました。';
+      case 'OAuthAccountNotLinked':
+        return 'このメールアドレスは既に別の認証方法で登録されています。';
+      case 'EmailCreateAccount':
+        return 'メールアカウント作成時にエラーが発生しました。';
+      case 'EmailSignin':
+        return 'メールサインイン時にエラーが発生しました。';
+      case 'Callback':
+        return '認証コールバック処理でエラーが発生しました。';
+      case 'Default':
+        return '認証中にエラーが発生しました。もう一度お試しください。';
       default:
         return '認証中にエラーが発生しました。もう一度お試しください。';
     }

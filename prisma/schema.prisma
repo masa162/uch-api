@@ -3,7 +3,7 @@
 
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -33,6 +33,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   articles      Article[]
+  comments      Comment[]
+  likes         Like[]
 }
 
 model Account {
@@ -87,4 +89,37 @@ model Article {
   isPublished  Boolean   @default(true)
   author       User      @relation(fields: [authorId], references: [id])
   authorId     String
+  comments     Comment[]
+  likes        Like[]
+}
+
+// ----------------------------------------
+// 追加: コメント／いいね（既存テーブルに対応）
+// ----------------------------------------
+
+model Comment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String
+  articleId String
+  userId    String
+
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  articleId String
+  userId    String
+
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, userId])
+  @@map("likes")
 }

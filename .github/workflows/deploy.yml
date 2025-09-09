@@ -44,33 +44,23 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /opt/uch
+            cd /home/nakayama/uch
             
             # Pull the latest code
             git pull origin main
             
-            # Create .env file from secrets
-            echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
-            echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
-            echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
-            echo "NODE_ENV=production" >> .env
-            echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
-            echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
-            echo "LINE_CHANNEL_ID=${{ secrets.LINE_CHANNEL_ID }}" >> .env
-            echo "LINE_CHANNEL_SECRET=${{ secrets.LINE_CHANNEL_SECRET }}" >> .env
-            
             # Pull and restart services
             echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            # Update docker-compose.yml with new image
+            # Update docker-compose.yml with new API image tag
             sed -i "s|image: ghcr.io/masa162/uch-api:.*|image: ghcr.io/masa162/uch-api:${{ github.sha }}|g" docker-compose.yml
             
-            # Pull and restart containers
-            docker compose pull app
-            docker compose up -d
+            # Pull and restart API service
+            docker compose -f docker-compose.yml pull api
+            docker compose -f docker-compose.yml up -d
             
             # Run database migrations
-            docker compose exec -T app npx prisma migrate deploy
+            docker compose -f docker-compose.yml exec -T api npx prisma migrate deploy
             
             # Clean up old images
             docker image prune -f
