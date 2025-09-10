@@ -36,6 +36,8 @@ export async function GET() {
 // 記事作成
 export async function POST(request: NextRequest) {
   try {
+    const cookieHeader = request.headers.get('cookie') || ''
+    console.log('POST /api/articles cookie length:', cookieHeader.length)
     const session = await getServerSession(authOptions);
     console.log('POST /api/articles session email:', session?.user?.email || null)
     
