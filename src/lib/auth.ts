@@ -21,8 +21,9 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
-    signIn: '/',
-    error: '/api/auth/error',
+    // サインイン/エラーはフロントの /signin に集約
+    signIn: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/signin`,
+    error: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/signin`,
   },
   callbacks: {
     async session({ session, token }) {
@@ -46,4 +47,3 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === 'development',
 }
-

@@ -64,7 +64,8 @@ const handler = NextAuth({
   pages: {
     // サインインUIはフロントエンドの /signin を利用
     signIn: `${FRONTEND_URL}/signin`,
-    error: '/api/auth/error',
+    // エラーもフロントのサインインに集約して表示（error クエリで受け取る）
+    error: `${FRONTEND_URL}/signin`,
   },
   callbacks: {
     async session({ session, token }) {
