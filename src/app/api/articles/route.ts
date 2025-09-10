@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { withCORS, optionsOK } from '@/lib/cors';
 
 // 記事一覧取得
 export async function GET() {
@@ -23,14 +24,19 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(articles);
+    return withCORS(NextResponse.json(articles));
   } catch (error) {
     console.error('Error fetching articles:', error);
-    return NextResponse.json(
+    return withCORS(NextResponse.json(
       { error: 'Failed to fetch articles' },
       { status: 500 }
-    );
+    ));
   }
+}
+
+// CORS preflight
+export async function OPTIONS() {
+  return optionsOK()
 }
 
 // 記事作成
@@ -43,10 +49,10 @@ export async function POST(request: NextRequest) {
     
     if (!session?.user?.email) {
       console.warn('POST /api/articles unauthorized: no session.email')
-      return NextResponse.json(
+      return withCORS(NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
-      );
+      ));
     }
 
     const body = await request.json();
@@ -98,12 +104,12 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(article, { status: 201 });
+    return withCORS(NextResponse.json(article, { status: 201 }));
   } catch (error) {
     console.error('Error creating article:', error);
-    return NextResponse.json(
+    return withCORS(NextResponse.json(
       { error: 'Failed to create article' },
       { status: 500 }
-    );
+    ));
   }
 }

@@ -1,6 +1,7 @@
 // src/app/api/articles/[slug]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { withCORS, optionsOK } from '@/lib/cors';
 
 // 記事詳細取得
 export async function GET(
@@ -25,19 +26,22 @@ export async function GET(
     });
 
     if (!article) {
-      return NextResponse.json(
+      return withCORS(NextResponse.json(
         { error: 'Article not found' },
         { status: 404 }
-      );
+      ));
     }
 
-    return NextResponse.json(article);
+    return withCORS(NextResponse.json(article));
   } catch (error) {
     console.error('Error fetching article:', error);
-    return NextResponse.json(
+    return withCORS(NextResponse.json(
       { error: 'Failed to fetch article' },
       { status: 500 }
-    );
+    ));
   }
 }
 
+export async function OPTIONS() {
+  return optionsOK()
+}
