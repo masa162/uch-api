@@ -57,6 +57,9 @@ const useDb = (process.env.AUTH_USE_DB ?? 'true').toLowerCase() !== 'false' && !
 const handler = NextAuth({
   ...(useDb ? { adapter: PrismaAdapter(prisma) } : {}),
   providers,
+  // 既存ユーザーのメールと一致する外部プロバイダの初回サインインも許可して自動リンク
+  // （家族内アプリであり、メール検証済み前提のため許容）
+  allowDangerousEmailAccountLinking: true,
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
