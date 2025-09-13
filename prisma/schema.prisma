@@ -37,6 +37,7 @@ model User {
   articles      Article[]
   comments      Comment[]
   likes         Like[]
+  media         Media[]
 }
 
 model Account {
