@@ -23,7 +23,7 @@ if (missingEnvVars.length > 0) {
   console.error('Please check your .env file and ensure all required variables are set.');
 }
 
-const providers = [];
+const providers = [] as any[];
 
 // Google Provider（環境変数が設定されている場合のみ）
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
@@ -47,6 +47,19 @@ if (process.env.LINE_CHANNEL_ID && process.env.LINE_CHANNEL_SECRET) {
   );
 } else {
   console.warn('LINE OAuth credentials not found. LINE sign-in will be disabled.');
+}
+
+// Diagnostics: log configured providers and key envs
+try {
+  const ids = providers.map((p: any) => p?.id).filter(Boolean)
+  console.log('[auth-config] providers:', ids, 'env', {
+    GOOGLE_CLIENT_ID: !!process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: !!process.env.GOOGLE_CLIENT_SECRET,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    FRONTEND_URL: process.env.FRONTEND_URL,
+  })
+} catch (e) {
+  console.warn('[auth-config] diag failed', e)
 }
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'
