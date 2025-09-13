@@ -37,9 +37,18 @@ export async function POST(req: NextRequest) {
     const array = new Uint8Array(await file.arrayBuffer())
     await client.send(new PutObjectCommand({ Bucket: BUCKET, Key: key, Body: array, ContentType: file.type || 'application/octet-stream' }))
 
+    // Resolve uploader by email or id
+    const email = (session.user as any)?.email as string | undefined
+    let uploader = null as any
+    if (email) uploader = await prisma.user.findFirst({ where: { email } })
+    if (!uploader && session.user.id) uploader = await prisma.user.findUnique({ where: { id: session.user.id as string } })
+    if (!uploader && email) {
+      uploader = await prisma.user.create({ data: { email, name: (session.user as any)?.name || null, image: (session.user as any)?.image || null } })
+    }
+
     const created = await prisma.media.create({
       data: {
-        uploaderId: session.user.id as string,
+        uploaderId: (uploader?.id as string) || (session.user.id as string),
         originalFilename: file.name || 'upload',
         storageKey: key,
         mimeType: file.type || 'application/octet-stream',
@@ -53,4 +62,3 @@ export async function POST(req: NextRequest) {
     return withCORS(NextResponse.json({ error: 'Failed to upload' }, { status: 500 }))
   }
 }
-

@@ -26,9 +26,18 @@ export async function POST(req: NextRequest) {
     }
 
     try {
+      // Resolve uploader by email or id to satisfy FK
+      const email = (session.user as any)?.email as string | undefined
+      let uploader = null as any
+      if (email) uploader = await prisma.user.findFirst({ where: { email } })
+      if (!uploader && session.user.id) uploader = await prisma.user.findUnique({ where: { id: session.user.id as string } })
+      if (!uploader && email) {
+        uploader = await prisma.user.create({ data: { email, name: (session.user as any)?.name || null, image: (session.user as any)?.image || null } })
+      }
+
       const created = await prisma.media.create({
         data: {
-          uploaderId: session.user.id as string,
+          uploaderId: (uploader?.id as string) || (session.user.id as string),
           originalFilename,
           storageKey,
           mimeType: fileType,
@@ -54,4 +63,3 @@ export async function POST(req: NextRequest) {
     return withCORS(NextResponse.json({ error: 'Failed to record upload' }, { status: 500 }))
   }
 }
-
