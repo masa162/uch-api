@@ -99,12 +99,7 @@ const handler = NextAuth({
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  pages: {
-    // サインインUIはフロントエンドの /signin を利用
-    signIn: `${FRONTEND_URL}/signin`,
-    // エラーもフロントのサインインに集約して表示（error クエリで受け取る）
-    error: `${FRONTEND_URL}/signin`,
-  },
+  // pages はデフォルトを使用（API ドメインでのフローを安定化）
   callbacks: {
     async session({ session, token }) {
       if (token && session.user) {
