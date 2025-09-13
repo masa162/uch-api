@@ -1,6 +1,7 @@
 // src/app/api/auth/[...nextauth]/route.ts
 
 import NextAuth from 'next-auth';
+import type { LoggerInstance } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import LineProvider from 'next-auth/providers/line'; // LINEプロバイダーをインポート
 import { PrismaAdapter } from '@auth/prisma-adapter';
@@ -54,9 +55,17 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'
 // AUTH_USE_DB=false または DATABASE_URL 未設定時はアダプターを無効化
 const useDb = (process.env.AUTH_USE_DB ?? 'true').toLowerCase() !== 'false' && !!process.env.DATABASE_URL
 
+// Verbose logger for investigation (prints in production when NEXTAUTH_DEBUG=true)
+const logger: Partial<LoggerInstance> = {
+  error: (...args) => console.error('[next-auth][error]', ...args),
+  warn:  (...args) => console.warn('[next-auth][warn]', ...args),
+  debug: (...args) => console.log('[next-auth][debug]', ...args),
+}
+
 const handler = NextAuth({
   ...(useDb ? { adapter: PrismaAdapter(prisma) } : {}),
   providers,
+  logger,
   cookies: {
     // セッショントークンをサブドメインでも共有できるようにする
     sessionToken: {
@@ -109,7 +118,31 @@ const handler = NextAuth({
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === 'development',
+  // Force debug when NEXTAUTH_DEBUG=true (even in production)
+  debug: process.env.NEXTAUTH_DEBUG === 'true' || process.env.NODE_ENV === 'development',
+  events: {
+    async signIn(message) {
+      console.log('[next-auth][event][signIn]', {
+        provider: message?.account?.provider,
+        user: !!message?.user,
+      })
+    },
+    async signOut(message) {
+      console.log('[next-auth][event][signOut]', { user: !!message?.session?.user })
+    },
+    async createUser(message) {
+      console.log('[next-auth][event][createUser]', { id: message?.user?.id })
+    },
+    async linkAccount(message) {
+      console.log('[next-auth][event][linkAccount]', { provider: message?.account?.provider })
+    },
+    async session(message) {
+      console.log('[next-auth][event][session]', { user: !!message?.session?.user })
+    },
+    async error(message) {
+      console.error('[next-auth][event][error]', message)
+    },
+  },
 });
 
 export { handler as GET, handler as POST };
