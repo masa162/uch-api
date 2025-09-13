@@ -16,8 +16,7 @@ export async function GET(
     }
 
     // データベースからメディア情報を取得
-    const { PrismaClient } = await import('@/lib/prisma')
-    const prisma = new PrismaClient()
+    const { prisma } = await import('@/lib/prisma')
     
     const media = await prisma.media.findUnique({
       where: { id },
