@@ -125,3 +125,34 @@ model Like {
   @@unique([articleId, userId])
   @@map("likes")
 }
+
+// ----------------------------------------
+// メディア管理
+// ----------------------------------------
+
+model Media {
+  @@map("media")
+  id               String   @id @default(cuid())
+  uploaderId       String   @map("uploader_id")
+  originalFilename String   @map("original_filename")
+  storageKey       String   @unique @map("storage_key")
+  mimeType         String   @map("mime_type")
+  status           String   @default("pending")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  uploader         User     @relation(fields: [uploaderId], references: [id])
+  optimized        MediaOptimized[]
+}
+
+model MediaOptimized {
+  @@map("media_optimized")
+  id         String   @id @default(cuid())
+  mediaId    String   @map("media_id")
+  storageKey String   @map("storage_key")
+  mimeType   String   @map("mime_type")
+  width      Int?
+  height     Int?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  media      Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+}
