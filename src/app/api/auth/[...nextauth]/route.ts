@@ -139,9 +139,6 @@ const handler = NextAuth({
     async session(message) {
       console.log('[next-auth][event][session]', { user: !!message?.session?.user })
     },
-    async error(message) {
-      console.error('[next-auth][event][error]', message)
-    },
   },
 });
 
