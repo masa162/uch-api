@@ -37,8 +37,10 @@ export async function createPresignedPutUrl(opts: { key: string; contentType: st
 }
 
 export function publicUrlFor(key: string) {
-  if (R2_PUBLIC_URL) return `${R2_PUBLIC_URL.replace(/\/$/, '')}/${key}`
-  // fallback virtual-host style
+  // If a public base is provided (pub-<account>.r2.dev), it requires the bucket segment
+  if (R2_PUBLIC_URL) {
+    return `${R2_PUBLIC_URL.replace(/\/$/, '')}/${R2_BUCKET_NAME}/${key}`
+  }
+  // Fallback to S3-style path endpoint (requires appropriate access policy)
   return `${R2_ENDPOINT.replace(/\/$/, '')}/${R2_BUCKET_NAME}/${key}`
 }
-
